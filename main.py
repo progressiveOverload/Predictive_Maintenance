@@ -103,5 +103,9 @@ def main():
     df['Type'].replace('M', 1, inplace=True)
     df['Type'].replace('H', 2, inplace=True)
 
+    # turn all columns into float for easier processing later
+    for column in df.columns:
+        df[column] = df[column].astype(float)
+
 if __name__ == "__main__":
     main()
