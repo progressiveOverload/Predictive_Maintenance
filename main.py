@@ -98,5 +98,10 @@ def main():
     sns.histplot(df['Power'])
 
 
+    # convert Type attribute into numbers, such that L = 0, M = 1, and H = 2
+    df['Type'].replace('L', 0, inplace=True)
+    df['Type'].replace('M', 1, inplace=True)
+    df['Type'].replace('H', 2, inplace=True)
+
 if __name__ == "__main__":
     main()
