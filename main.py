@@ -81,8 +81,6 @@ def main():
     # drop individual failure types
     df.drop(['TWF', 'HDF', 'PWF', 'OSF', 'RNF'], axis=1, inplace=True)
 
-
-
     failure_types = df.loc[:, ['Machine failure']]
 
     rows_sum = failure_types.sum(axis=1)
@@ -90,13 +88,13 @@ def main():
     fig, ax = plt.subplots(figsize=(5, 5))
     sns.countplot(x=rows_sum, ax=ax)
     for patch in ax.patches:
-        ax.annotate(str(patch.get_height()), (patch.get_x() + patch.get_width()/2, patch.get_height()), ha='center', va='bottom')
+        ax.annotate(str(patch.get_height()), (patch.get_x() + patch.get_width() / 2, patch.get_height()), ha='center',
+                    va='bottom')
         ax.set_title('Count of different failure types')
 
     df['Power'] = df[['Rotational speed', 'Torque']].product(axis=1)
 
     sns.histplot(df['Power'])
-
 
     # convert Type attribute into numbers, such that L = 0, M = 1, and H = 2
     df['Type'].replace('L', 0, inplace=True)
@@ -106,6 +104,23 @@ def main():
     # turn all columns into float for easier processing later
     for column in df.columns:
         df[column] = df[column].astype(float)
+
+    print(df.dtypes)
+
+    # List of columns to exclude from normalization and winsorization
+    excluded_columns = ['Type', 'Machine failure']
+
+    for col in df.columns:
+        if col not in excluded_columns:
+            # calculate the IQR (interquartile range)
+            Q1 = df[col].quantile(0.25)
+            Q3 = df[col].quantile(0.75)
+            IQR = Q3 - Q1
+            outliers = df[(df[col] <= (Q1 - 1.5 * IQR)) | (df[col] >= (Q3 + 1.5 * IQR))]
+            if not outliers.empty:
+                # df.loc[outliers.index, col] = winsorize(outliers[col], limits=[0.08, 0.08])
+                df.drop(outliers.index, inplace=True)
+
 
 if __name__ == "__main__":
     main()
