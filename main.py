@@ -93,6 +93,8 @@ def main():
         ax.annotate(str(patch.get_height()), (patch.get_x() + patch.get_width()/2, patch.get_height()), ha='center', va='bottom')
         ax.set_title('Count of different failure types')
 
+    df['Power'] = df[['Rotational speed', 'Torque']].product(axis=1)
+
 
 if __name__ == "__main__":
     main()
