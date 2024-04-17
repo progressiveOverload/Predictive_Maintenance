@@ -149,14 +149,22 @@ def main():
     plot_columns = [col for col in df.columns if col not in excluded_columns]
     df[plot_columns].plot(kind='box', figsize=(12, 6), title='Box and Whisker Plots', ylabel='Value', grid=True)
 
-
     threshold = 0.3
     correlation = df.corr()
     matrix = correlation.where((abs(correlation) >= threshold)).isna()
     plt.figure(figsize=(10, 8))
     sns.heatmap(df.corr(), cmap="coolwarm", annot=True, mask=matrix)
 
-
     sns.pairplot(df.sample(frac=0.05), hue='Machine failure')
+
+    sample = df.sort_values(by=['Machine failure'], ascending=False).head(300)
+
+    plt.figure(figsize=(15, 8))
+    pd.plotting.parallel_coordinates(sample, 'Machine failure', color=('#3D5656', '#68B984', '#FED049'))
+
+    df_profile = pdpf.ProfileReport(df, dark_mode=True)
+    print(df_profile)
+
+
 if __name__ == "__main__":
     main()
