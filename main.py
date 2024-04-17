@@ -58,6 +58,41 @@ def main():
     # Reset the use_inf_as_na option to its default value
     pd.reset_option('mode.use_inf_as_na')
 
+    df_failures = df.loc[:, ['TWF', 'HDF', 'PWF', 'OSF', 'RNF']]
+    # Calculate the sum of the values in each row
+    rows_sum = df_failures.sum(axis=1)
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    sns.countplot(x=rows_sum, ax=ax)
+    for patch in ax.patches:
+        ax.annotate(str(patch.get_height()), (patch.get_x() + patch.get_width() / 2, patch.get_height()), ha='center',
+                    va='bottom')
+
+    ax.set_title('Number of failure types per record')
+
+    df['Machine failure'] = 0
+
+    df.loc[df['TWF'] == 1, 'Machine failure'] = 1
+    df.loc[df['HDF'] == 1, 'Machine failure'] = 1
+    df.loc[df['PWF'] == 1, 'Machine failure'] = 1
+    df.loc[df['OSF'] == 1, 'Machine failure'] = 1
+    df.loc[df['RNF'] == 1, 'Machine failure'] = 1
+
+    # drop individual failure types
+    df.drop(['TWF', 'HDF', 'PWF', 'OSF', 'RNF'], axis=1, inplace=True)
+
+
+
+    failure_types = df.loc[:, ['Machine failure']]
+
+    rows_sum = failure_types.sum(axis=1)
+
+    fig, ax = plt.subplots(figsize=(5, 5))
+    sns.countplot(x=rows_sum, ax=ax)
+    for patch in ax.patches:
+        ax.annotate(str(patch.get_height()), (patch.get_x() + patch.get_width()/2, patch.get_height()), ha='center', va='bottom')
+        ax.set_title('Count of different failure types')
+
 
 if __name__ == "__main__":
     main()
