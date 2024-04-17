@@ -95,6 +95,8 @@ def main():
 
     df['Power'] = df[['Rotational speed', 'Torque']].product(axis=1)
 
+    sns.histplot(df['Power'])
+
 
 if __name__ == "__main__":
     main()
