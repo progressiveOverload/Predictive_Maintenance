@@ -146,6 +146,9 @@ def main():
     for i, col in enumerate(df.columns):
         sns.boxplot(x="Machine failure", y=col, data=df, ax=ax[i // 4][i % 4])
 
+    plot_columns = [col for col in df.columns if col not in excluded_columns]
+    df[plot_columns].plot(kind='box', figsize=(12, 6), title='Box and Whisker Plots', ylabel='Value', grid=True)
+
 
 if __name__ == "__main__":
     main()
