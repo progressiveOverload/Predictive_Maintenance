@@ -150,5 +150,13 @@ def main():
     df[plot_columns].plot(kind='box', figsize=(12, 6), title='Box and Whisker Plots', ylabel='Value', grid=True)
 
 
+    threshold = 0.3
+    correlation = df.corr()
+    matrix = correlation.where((abs(correlation) >= threshold)).isna()
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df.corr(), cmap="coolwarm", annot=True, mask=matrix)
+
+
+    sns.pairplot(df.sample(frac=0.05), hue='Machine failure')
 if __name__ == "__main__":
     main()
