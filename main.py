@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
+from sklearn.neighbors import LocalOutlierFactor
+
 
 warnings.filterwarnings("ignore", message=".*invalid escape sequence.*", category=SyntaxWarning)
 warnings.filterwarnings("ignore", message=".*use_inf_as_na option is deprecated.*", category=FutureWarning)
@@ -121,6 +123,19 @@ def main():
                 # df.loc[outliers.index, col] = winsorize(outliers[col], limits=[0.08, 0.08])
                 df.drop(outliers.index, inplace=True)
 
+
+
+
+    # create the LOF model
+    model = LocalOutlierFactor(n_neighbors=5)
+
+    # use the model to predict the outlier scores for each row
+    scores = model.fit_predict(df)
+
+    # identify the outlier rows (those with a negative score) and remove them
+    outliers = df[scores == -1]
+    if not outliers.empty:
+        df.drop(outliers.index, inplace=True)
 
 if __name__ == "__main__":
     main()
