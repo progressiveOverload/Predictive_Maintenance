@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
 from sklearn.neighbors import LocalOutlierFactor
-
+from scipy.stats import zscore
 
 warnings.filterwarnings("ignore", message=".*invalid escape sequence.*", category=SyntaxWarning)
 warnings.filterwarnings("ignore", message=".*use_inf_as_na option is deprecated.*", category=FutureWarning)
@@ -123,9 +123,6 @@ def main():
                 # df.loc[outliers.index, col] = winsorize(outliers[col], limits=[0.08, 0.08])
                 df.drop(outliers.index, inplace=True)
 
-
-
-
     # create the LOF model
     model = LocalOutlierFactor(n_neighbors=5)
 
@@ -136,6 +133,15 @@ def main():
     outliers = df[scores == -1]
     if not outliers.empty:
         df.drop(outliers.index, inplace=True)
+
+    print(df.shape)
+
+    # Iterate over the columns in the dataframe
+    for col in df.columns:
+        if col not in excluded_columns:
+            # Normalize the values in the column
+            df[col] = zscore(df[col])
+
 
 if __name__ == "__main__":
     main()
