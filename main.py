@@ -142,6 +142,10 @@ def main():
             # Normalize the values in the column
             df[col] = zscore(df[col])
 
+    fig, ax = plt.subplots(2, 4, figsize=(20, 10))
+    for i, col in enumerate(df.columns):
+        sns.boxplot(x="Machine failure", y=col, data=df, ax=ax[i // 4][i % 4])
+
 
 if __name__ == "__main__":
     main()
