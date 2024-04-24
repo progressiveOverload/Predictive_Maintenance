@@ -5,6 +5,9 @@ import seaborn as sns
 import warnings
 from sklearn.neighbors import LocalOutlierFactor
 from scipy.stats import zscore
+from yellowbrick.cluster import KElbowVisualizer
+from sklearn.cluster import KMeans
+
 
 warnings.filterwarnings("ignore", message=".*invalid escape sequence.*", category=SyntaxWarning)
 warnings.filterwarnings("ignore", message=".*use_inf_as_na option is deprecated.*", category=FutureWarning)
@@ -164,6 +167,74 @@ def main():
 
     df_profile = pdpf.ProfileReport(df, dark_mode=True)
     print(df_profile)
+
+
+    # features to use for clustering
+    X = df[["Air temperature", "Process temperature", "Rotational speed", "Torque", "Tool wear", "Power"]]
+
+
+
+    # K-means clustering
+    model = KMeans()
+
+    visualizer = KElbowVisualizer(model, k=(2,10)) # it turns out that k = 4 is the optimal number of clusters
+
+    visualizer.fit(X)
+    visualizer.show()
+
+
+
+
+    # K-means clustering
+    kmeans = KMeans(init="random",  n_clusters=4,
+                    n_init=10, max_iter=300, random_state=42)
+    kmeans.fit(X)
+
+    df["kmeans_cluster"] = kmeans.predict(X)
+
+    plt.figure(figsize=(10, 8))
+
+    # create a pairplot of the data, colored by cluster label
+    sns.pairplot(df.sample(frac=0.05), hue="kmeans_cluster", vars=["Air temperature", "Process temperature", "Rotational speed", "Torque", "Tool wear", "Power"])
+    plt.show()
+
+    from sklearn.metrics import silhouette_score
+
+    # calculate the silhouette coefficient
+    score = silhouette_score(X, kmeans.predict(X))
+
+    print(f"Silhouette Coefficient: {score:.3f}")
+
+    import scipy.cluster.hierarchy as shc
+
+# plot dendogram
+    plt.figure(figsize=(10, 7))
+    plt.title("Predictive Maintenance Dendrogram")
+
+    # Selecting Annual Income and Spending Scores by index
+    clusters = shc.linkage(X, method='ward', metric="euclidean")
+    shc.dendrogram(Z=clusters)
+    plt.show()
+
+    from sklearn.cluster import AgglomerativeClustering
+
+    # Hierarchical clustering
+    model = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='ward')
+    model.fit(X)
+    df["hierarchical_cluster"] = model.labels_
+
+    plt.figure(figsize=(10, 8))
+
+    # create a pairplot of the data, colored by cluster label
+    sns.pairplot(df.sample(frac=0.05), hue="hierarchical_cluster", vars=["Air temperature", "Process temperature", "Rotational speed", "Torque", "Tool wear", "Power"])
+    plt.show()
+
+    from sklearn.metrics import silhouette_score
+
+    # calculate the silhouette coefficient
+    score = silhouette_score(X, df["hierarchical_cluster"])
+
+    print(f"Silhouette Coefficient: {score:.3f}")
 
 
 if __name__ == "__main__":
